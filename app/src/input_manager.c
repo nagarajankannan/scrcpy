@@ -11,6 +11,7 @@
 #include "android/keycodes.h"
 #include "events.h"
 #include "input_events.h"
+#include "mac_keys.h"
 #include "screen.h"
 #include "shortcut_mod.h"
 #include "util/log.h"
@@ -48,6 +49,7 @@ sc_input_manager_init(struct sc_input_manager *im,
     if (params->trackpad && !im->trackpad) {
         LOGW("--trackpad is only available with --mouse=sdk, ignoring");
     }
+    im->mac_keys = params->mac_keys;
     im->tp.active = false;
     im->tp.count = 0;
 
@@ -585,7 +587,13 @@ sc_input_manager_process_key(struct sc_input_manager *im,
     bool disconnected = im->disconnected;
 
     SDL_Keycode sdl_keycode = event->key;
+    SDL_Scancode sdl_scancode = event->scancode;
     uint16_t mod = sc_sdl_mod_normalize(event->mod);
+    if (im->mac_keys) {
+        // Rewrite before shortcut handling, so that Cmd+V also gets the
+        // clipboard synchronization of Ctrl+V below.
+        sc_mac_keys_translate(&sdl_keycode, &sdl_scancode, &mod);
+    }
     bool down = event->type == SDL_EVENT_KEY_DOWN;
     bool ctrl = mod & SDL_KMOD_CTRL;
     bool shift = mod & SDL_KMOD_SHIFT;
@@ -871,7 +879,7 @@ sc_input_manager_process_key(struct sc_input_manager *im,
     enum sc_keycode keycode = sc_keycode_from_sdl(sdl_keycode);
     // Accept SC_KEYCODE_UNKNOWN, as long as the physical scancode is known
 
-    enum sc_scancode scancode = sc_scancode_from_sdl(event->scancode);
+    enum sc_scancode scancode = sc_scancode_from_sdl(sdl_scancode);
     if (scancode == SC_SCANCODE_UNKNOWN) {
         return;
     }

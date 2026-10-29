@@ -42,6 +42,7 @@ enum {
     OPT_NO_KEY_REPEAT,
     OPT_LEGACY_PASTE,
     OPT_TRACKPAD,
+    OPT_MAC_KEYS,
     OPT_VIDEO_ENCODER,
     OPT_POWER_OFF_ON_CLOSE,
     OPT_V4L2_SINK,
@@ -488,6 +489,19 @@ static const struct sc_option options[] = {
         .longopt_id = OPT_KILL_ADB_ON_CLOSE,
         .longopt = "kill-adb-on-close",
         .text = "Kill adb when scrcpy terminates.",
+    },
+    {
+        .longopt_id = OPT_MAC_KEYS,
+        .longopt = "mac-keys",
+        .text = "Make a Mac keyboard behave like an Android keyboard: Cmd is "
+                "sent as Ctrl (Cmd+A, Cmd+Z, Cmd+C, Cmd+V, ... become the "
+                "Android shortcuts), Cmd+arrow moves to the line ends like "
+                "Alt+arrow on Android, and Option+arrow moves by word like "
+                "Ctrl+arrow. Cmd+V still copies the computer clipboard to "
+                "the device first.\n"
+                "Unless --shortcut-mod is given, scrcpy shortcuts move to "
+                "Right Option (ralt) so that Cmd and Left Option reach the "
+                "device.",
     },
     {
         .longopt_id = OPT_TRACKPAD,
@@ -2796,6 +2810,9 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
             case OPT_TRACKPAD:
                 opts->trackpad = true;
                 break;
+            case OPT_MAC_KEYS:
+                opts->mac_keys = true;
+                break;
             case OPT_POWER_OFF_ON_CLOSE:
                 opts->power_off_on_close = true;
                 break;
@@ -3294,6 +3311,14 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
             && !opts->mouse_hover) {
         LOGE("--no-mouse-over is specific to --mouse=sdk");
         return false;
+    }
+
+    if (opts->mac_keys && opts->shortcut_mods
+            == (SC_SHORTCUT_MOD_LALT | SC_SHORTCUT_MOD_LSUPER)) {
+        // The default shortcut modifiers are the keys --mac-keys forwards.
+        LOGI("--mac-keys: scrcpy shortcuts moved to Right Option "
+             "(--shortcut-mod=ralt)");
+        opts->shortcut_mods = SC_SHORTCUT_MOD_RALT;
     }
 
     if ((opts->tunnel_host || opts->tunnel_port) && !opts->force_adb_forward) {

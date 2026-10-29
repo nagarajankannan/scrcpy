@@ -23,6 +23,7 @@ src = [
     'src/hwdec.c',
     'src/icon.c',
     'src/input_manager.c',
+    'src/mac_keys.c',
     'src/keyboard_sdk.c',
     'src/mouse_capture.c',
     'src/mouse_sdk.c',
@@ -309,6 +310,10 @@ if get_option('buildtype') == 'debug'
         ['test_device_msg_deserialize', [
             'tests/test_device_msg_deserialize.c',
             'src/device_msg.c',
+        ]],
+        ['test_mac_keys', [
+            'tests/test_mac_keys.c',
+            'src/mac_keys.c',
         ]],
         ['test_orientation', [
             'tests/test_orientation.c',

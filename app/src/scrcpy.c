@@ -826,6 +826,7 @@ aoa_complete:
             .mouse_bindings = options->mouse_bindings,
             .legacy_paste = options->legacy_paste,
             .trackpad = options->trackpad,
+            .mac_keys = options->mac_keys,
             .clipboard_autosync = options->clipboard_autosync,
             .shortcut_mods = options->shortcut_mods,
             .window_title = window_title,

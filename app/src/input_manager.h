@@ -39,6 +39,9 @@ struct sc_input_manager {
     // --trackpad: two fingers on the computer trackpad drive two device
     // pointers anchored at the mouse cursor (see input_manager.c).
     bool trackpad;
+    // --mac-keys: rewrite Cmd/Option key events to Android's Ctrl/Alt
+    // conventions (see mac_keys.h).
+    bool mac_keys;
     struct {
         bool active;            // two-pointer gesture in progress
         unsigned count;         // trackpad fingers currently down
@@ -77,6 +80,7 @@ struct sc_input_manager_params {
     struct sc_mouse_bindings mouse_bindings;
     bool legacy_paste;
     bool trackpad;
+    bool mac_keys;
     bool clipboard_autosync;
     uint8_t shortcut_mods; // OR of enum sc_shortcut_mod values
 };
